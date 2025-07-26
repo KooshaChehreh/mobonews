@@ -22,4 +22,4 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
 
     class Meta:
-        unique_together = ('source_site', 'path')
+        unique_together = ('source_site', 'url')

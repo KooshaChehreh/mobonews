@@ -83,10 +83,10 @@ WSGI_APPLICATION = 'moboscrap.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'scraper_db',
-        'USER': 'scraper_user',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
+        'NAME': 'postgres',
+        'USER': 'postgres', 
+        'PASSWORD': 'postgres', 
+        'HOST': 'db', 
         'PORT': '5432',
     }
 }
