@@ -14,7 +14,7 @@ class Product(models.Model):
     phone_model = models.CharField(max_length=255, verbose_name="مدل گوشی")
     color_prices = models.JSONField(default=dict, verbose_name="قیمت بر اساس رنگ")
     warranty = models.CharField(max_length=100, null=True, blank=True, verbose_name="گارانتی")
-    availability = models.CharField(max_length=50, null=True, blank=True, verbose_name="موجود است؟")
+    stock = models.CharField(max_length=50, null=True, blank=True, verbose_name="موجودی")
     description = models.TextField(null=True, blank=True, verbose_name="توضیحات محصول")
     source_site = models.CharField(max_length=2, choices=SITE_CHOICES, verbose_name="منبع سایت")
     path = models.CharField(max_length=255, verbose_name="آدرس محصول")
