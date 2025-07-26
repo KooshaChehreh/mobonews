@@ -5,7 +5,7 @@ from scraper.models import Product
 class InsuranceAdmin(admin.ModelAdmin):
     list_display = (
         "id",
-        "phone_model",
+        "product_name",
         "color_prices",
         "warranty",
         "stock",

@@ -8,16 +8,16 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-m',
-            '--model',
+            '-n',
+            '--name',
             type=str,
-            help='Optional product model name to scrape (e.g., "Samsung Galaxy S24 FE")'
+            help='Optional product name to scrape (e.g., "Samsung Galaxy S24 FE")'
         )
 
     def handle(self, *args, **kwargs):
-        phone_model = kwargs['model']
+        product_name = kwargs['name']
         try:
-            results = scrape_ilandino_site(phone_model=phone_model)
+            results = scrape_ilandino_site(product_name=product_name)
             for result in results:
                 if "Updated" in result:
                     self.stdout.write(self.style.SUCCESS(result))

@@ -22,7 +22,7 @@ class ScrapIlandino(Scraper):
         return color_price_pairs
 
 
-    def scrap(self, phone_model=None):
+    def scrap(self, product_name=None):
 
         headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
@@ -34,9 +34,9 @@ class ScrapIlandino(Scraper):
         
         url_list = []
         results = []
-        if phone_model is not None:
+        if product_name is not None:
             try:
-                product = Product.objects.get(phone_model=phone_model)
+                product = Product.objects.get(product_name=product_name)
                 url_list.append(product.url) 
             except Product.DoesNotExist:
                 raise ProductNotFound
@@ -67,26 +67,26 @@ class ScrapIlandino(Scraper):
                 # Extraction of color and price pair
                 color_price_data = self.extract_color_price(form_data)
 
-                if not phone_model:
+                if not product_name:
                     try:
                         product = Product.objects.get(url=url)
-                        phone_model_for_save = product.phone_model
+                        product_name_for_save = product.product_name
                     except Product.DoesNotExist:
                         results.append(f"Skipped {url}: No product record found")
                         continue
                 else:
-                    phone_model_for_save = phone_model
+                    product_name_for_save = product_name
 
                 # Save the scraped data in database
                 try:
                     message = Product.save_product_data(
-                        phone_model=phone_model_for_save,
+                        product_name=product_name_for_save,
                         color_price_data=color_price_data,
                         description=description,
                     )
                     results.append(message)
                 except ProductNotFound as e:
-                    results.append(f"Failed {phone_model_for_save}: {e.message} (Code: {e.code})")
+                    results.append(f"Failed {product_name_for_save}: {e.message} (Code: {e.code})")
         
             except requests.RequestException as e:
                 results.append(f"Failed {url}: Network error - {e}")
