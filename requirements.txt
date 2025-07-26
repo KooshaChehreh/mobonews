@@ -27,3 +27,4 @@ redis
 django-celery-beat
 bs4
 requests
+lxml

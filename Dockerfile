@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM docker.arvancloud.ir/python:3.12
 
 # RUN mkdir /app
 
