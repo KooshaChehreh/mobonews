@@ -17,7 +17,7 @@ class Product(models.Model):
     stock = models.CharField(max_length=50, null=True, blank=True, verbose_name="موجودی")
     description = models.TextField(null=True, blank=True, verbose_name="توضیحات محصول")
     source_site = models.CharField(max_length=2, choices=SITE_CHOICES, verbose_name="منبع سایت")
-    path = models.CharField(max_length=255, verbose_name="آدرس محصول")
+    url = models.CharField(max_length=255, verbose_name="آدرس محصول")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
 

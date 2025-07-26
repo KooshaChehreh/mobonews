@@ -7,12 +7,12 @@ class ReferralSerialzer(serializers.ModelSerializer):
         fields = [
         "id",
         "phone_model",
-        "price",
+        "color_prices",
         "warranty",
-        "availability",
+        "stock",
         "description",
         "source_site",
-        "path",
+        "url",
         "created_at",
         "updated_at",
         ]

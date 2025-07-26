@@ -1,6 +1,6 @@
 from .models import Product
 
-def save_product_data(phone_model, color_price_data, description, warranty, stock):
+def save_product_data(phone_model, color_price_data, description=None, warranty=None, stock=None):
     """
     Save or update a product record with color-price JSON, description, warranty and stock.
     
@@ -12,16 +12,14 @@ def save_product_data(phone_model, color_price_data, description, warranty, stoc
         stock (int): The invetory of the product
     """
     try:
-        # Check if record exists
         if not Product.objects.filter(phone_model=phone_model).exists():
             return f"No record found for {phone_model}"
         
-        # Update existing record
         Product.objects.filter(phone_model=phone_model).update(
             color_prices=color_price_data or {},
-            description=description or '',
-            warranty=warranty or '',
-            stock=stock or 0
+            description=description,
+            warranty=warranty,
+            stock=stock
         )
         return f"Updated {phone_model}"
     except Exception as e:

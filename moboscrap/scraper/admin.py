@@ -6,12 +6,12 @@ class InsuranceAdmin(admin.ModelAdmin):
     list_display = (
         "id",
         "phone_model",
-        "price",
+        "color_prices",
         "warranty",
-        "availability",
+        "stock",
         "description",
         "source_site",
-        "path",
+        "url",
         "created_at",
         "updated_at",
     )
