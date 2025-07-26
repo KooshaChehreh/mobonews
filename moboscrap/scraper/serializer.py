@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from scraper.models import Product
 
-class ReferralSerialzer(serializers.ModelSerializer):
+class ProductSerialzer(serializers.ModelSerializer):
     class Meta:
         models = Product
         fields = [
