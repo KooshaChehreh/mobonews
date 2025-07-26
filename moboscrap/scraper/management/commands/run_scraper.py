@@ -15,7 +15,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **kwargs):
-        phone_model = kwargs['phone_model']
+        phone_model = kwargs['model']
         try:
             results = scrape_ilandino_site(phone_model=phone_model)
             for result in results:

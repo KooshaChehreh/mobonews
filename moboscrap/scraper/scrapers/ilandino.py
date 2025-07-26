@@ -80,7 +80,6 @@ def scrape_ilandino_site(phone_model=None):
             try:
                 message = save_product_data(
                     phone_model=phone_model_for_save,
-                    product_url=url,
                     color_price_data=color_price_data,
                     description=description,
                 )
