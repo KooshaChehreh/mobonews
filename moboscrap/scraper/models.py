@@ -12,7 +12,7 @@ class Product(models.Model):
         (SITE_GREENLION, "گرین لاین"),
     ]
     phone_model = models.CharField(max_length=255, verbose_name="مدل گوشی")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="قیمت")
+    color_prices = models.JSONField(default=dict, verbose_name="قیمت بر اساس رنگ")
     warranty = models.CharField(max_length=100, null=True, blank=True, verbose_name="گارانتی")
     availability = models.CharField(max_length=50, null=True, blank=True, verbose_name="موجود است؟")
     description = models.TextField(null=True, blank=True, verbose_name="توضیحات محصول")
