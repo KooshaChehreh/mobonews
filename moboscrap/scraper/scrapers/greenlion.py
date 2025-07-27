@@ -9,9 +9,10 @@ from scraper.scrapers.base_scraper import Scraper
 # logging.basicConfig(filename='logs/scraper.log', level=logging.INFO)
 
 
-class ScrapDiznoland():
-    PRICE_XPATH = "//div[contains(@class, 'product')]/section[2]/div//p[contains(@class, 'price')]/span/bdi/text() | //span[contains(@class, 'woocommerce-Price-amount')]/bdi/text()"
-    DESCRIPTION_XPATHS = "//*[@id='tab-description']/p[1]/text()"
+class ScrapGreenlion():
+    PRICE_XPATH = "//div[contains(@class, 'product')]//p[contains(@class, 'price')]//span[contains(@class, 'amount')]/bdi/text()"
+    DESCRIPTION_XPATHS = "//div[contains(@class, 'product')]//section[4]//div[contains(@class, 'description') or contains(@class, 'content')]//text()"
+    WARRANTY_XPATH = "//div[contains(@class, 'product') or contains(@class, 'offer')]//ul/li/span[2]/text()"
     
 
 
@@ -46,7 +47,7 @@ class ScrapDiznoland():
                 tree = html.fromstring(response.content)
                 
                 price_nodes = tree.xpath(self.PRICE_XPATH)
-                price = int(price_nodes[3].strip().replace(',', '')) if price_nodes else None
+                price = int(price_nodes[0].strip().replace(',', '')) if price_nodes else None
 
                 description = ''
                 description_nodes = tree.xpath(self.DESCRIPTION_XPATHS)
@@ -54,9 +55,7 @@ class ScrapDiznoland():
 
                 warranty = None
                 warranty_nodes = tree.xpath(self.WARRANTY_XPATH)
-                warranty = ', '.join(node.strip() for node in warranty_nodes if node.strip()) if warranty_nodes else None
-
-                
+                warranty = warranty_nodes[0].strip() if warranty_nodes else None
                 try:
                     product = Product.objects.get(url=url)
                     product_name_for_save = product.product_name
@@ -81,21 +80,6 @@ class ScrapDiznoland():
                 results.append(f"Failed {url}: Unexpected error - {e}")
         
         return results if results else ["No URLs processed"]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

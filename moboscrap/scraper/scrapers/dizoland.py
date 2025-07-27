@@ -9,7 +9,7 @@ from scraper.scrapers.base_scraper import Scraper
 # logging.basicConfig(filename='logs/scraper.log', level=logging.INFO)
 
 
-class ScrapDiznoland():
+class ScrapDiznoland(Scraper):
     PRICE_XPATH = "//div[contains(@class, 'product')]/section[2]/div//p[contains(@class, 'price')]/span/bdi/text() | //span[contains(@class, 'woocommerce-Price-amount')]/bdi/text()"
     DESCRIPTION_XPATHS = "//*[@id='tab-description']/p[1]/text()"
     WARRANTY_XPATH = "//form[contains(@class, 'variations_form')]//select[contains(@name, 'guarantee') or contains(@id, 'pa_guarantee')]/option/text()"
