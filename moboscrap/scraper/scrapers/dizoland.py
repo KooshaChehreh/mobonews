@@ -1,12 +1,15 @@
 import json
-# import logging
+import logging
 import requests
 import urllib.parse
 from lxml  import html
 from scraper.models import Product
 from scraper.exceptions import ProductNotFound
 from scraper.scrapers.base_scraper import Scraper
-# logging.basicConfig(filename='logs/scraper.log', level=logging.INFO)
+
+
+# Log Config
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class ScrapDiznoland(Scraper):
@@ -25,32 +28,24 @@ class ScrapDiznoland(Scraper):
             'Connection': 'keep-alive'
         }
         
-        url_list = []
-        results = []
-        if product is not None:
-            try:
-                product = Product.objects.get(product_name=product)
-                url_list.append(product.url) 
-            except Product.DoesNotExist:
-                raise ProductNotFound
-        else:
-            products = Product.objects.filter(source_site=Product.SITE_DIZOLAND).values('url')
-            url_list = [product['url'] for product in products]
-        
+        url_list = self.get_scrap_urls(site_constant=Product.SITE_DIZOLAND, product=product)
         
         for url in url_list:
             try:
-                
-                response = requests.get("https://dizoland.com/product/roborock-saros-10r/", headers=headers, timeout=10)
+                logging.info(f"Scraping URL: {url}")
+                response = requests.get(url, headers=headers, timeout=10)
                 response.raise_for_status()
                 tree = html.fromstring(response.content)
                 
                 price_nodes = tree.xpath(self.PRICE_XPATH)
                 price = int(price_nodes[3].strip().replace(',', '')) if price_nodes else None
-
+                
                 description = ''
                 description_nodes = tree.xpath(self.DESCRIPTION_XPATHS)
-                description = ' '.join(text.strip() for text in description_nodes if text.strip())
+                if description_nodes:
+                    description = ' '.join(text.strip() for text in description_nodes if text.strip())
+                else:
+                    logging.error(f"Error extracting description for {url}: {e}")
 
                 warranty = None
                 warranty_nodes = tree.xpath(self.WARRANTY_XPATH)
@@ -61,7 +56,7 @@ class ScrapDiznoland(Scraper):
                     product = Product.objects.get(url=url)
                     product_name_for_save = product.product_name
                 except Product.DoesNotExist:
-                    results.append(f"Skipped {url}: No product record found")
+                    logging.warning(f"No product record found for {url}")
                     continue
                 
                 # Save the scraped data in database
@@ -72,16 +67,16 @@ class ScrapDiznoland(Scraper):
                         price=price,
                         warranty=warranty
                     )
-                    results.append(message)
+                    logging.info(f"Product saved with message: {message}")
                 except ProductNotFound as e:
-                    results.append(f"Failed {product_name_for_save}: {e.message} (Code: {e.code})")
+                    logging.error(f"Failed to save {product_name_for_save}: {e.message} (Code: {e.code})")
         
             except requests.RequestException as e:
-                results.append(f"Failed {url}: Network error - {e}")
+                logging.error(f"Network error for {url}: {e}")
             except Exception as e:
-                results.append(f"Failed {url}: Unexpected error - {e}")
+                logging.error(f"Unexpected error for {url}: {e}")
         
-        return results if results else ["No URLs processed"]
+        logging.info(f"Scraping completed with DIZOLAND")
 
 
 

@@ -1,5 +1,9 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+import logging
+
+# Log Config
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Product(models.Model):
     SITE_ILANDINO = "IL"
@@ -48,12 +52,10 @@ class Product(models.Model):
             stock (int): The invetory of the product
         """
         try:
-            if not Product.objects.filter(product_name=product_name).exists():
-                return f"No record found for {product_name}"
             try:
                 target_product = Product.objects.get(product_name=product_name)
             except Product.DoesNotExist:
-                print("product not dound")
+                logging.error(f"No record found for {product_name}") 
             if target_product.product_type == Product.PRODUCT_TYPE_PHONE:
                 if color_price_data is not None:
                     target_product.color_prices = color_price_data
@@ -62,8 +64,10 @@ class Product(models.Model):
                     target_product.stock = stock
                     target_product.price = None
                     target_product.save()
+
+                    return f"Updated {product_name}"
                 else:
-                    raise ValidationError("color price could not be empty for phones")
+                    logging.error(f"color price field could not be empty for {product_name}")
             else:
                 if price is not None:
                     target_product.price = price  # For non-phones
@@ -72,8 +76,9 @@ class Product(models.Model):
                     target_product.warranty = warranty
                     target_product.stock = stock
                     target_product.save()
+
+                    return f"Updated {product_name}"
                 else:
-                    raise ValidationError("price could not be empty for products")
-            print(f"Updated {product_name}")
+                    logging.error(f"price field could not be empty for {product_name}")
         except Exception as e:
             return f"Error updating {product_name}: {e}"

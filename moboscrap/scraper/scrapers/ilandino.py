@@ -1,13 +1,14 @@
 import json
-# import logging
+import logging
 import requests
 import urllib.parse
 from lxml  import html
 from scraper.models import Product
 from scraper.exceptions import ProductNotFound
 from scraper.scrapers.base_scraper import Scraper
-# logging.basicConfig(filename='logs/scraper.log', level=logging.INFO)
 
+# Log Config
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class ScrapIlandino(Scraper):
     FORM_XPATH = '//form[contains(@class, "variations_form")]'
@@ -17,17 +18,32 @@ class ScrapIlandino(Scraper):
     
     def extract_color_price(self, form_nodes):
         form_data = []
-        for form in form_nodes:
-            variations = form.get('data-product_variations')
-            if variations:
-                variations_data = json.loads(variations)
-                form_data.append(variations_data)
+        try:
+            for form in form_nodes:
+                variations = form.get('data-product_variations')
+                if variations:
+                    try:
+                        variations_data = json.loads(variations)
+                        form_data.append(variations_data)
+                    except json.JSONDecodeError as e:
+                            logging.error(f"Failed to parse variations JSON: {e}")
+                            continue
+        except Exception as e:
+            logging.error(f"Error extracting variations: {e}")
+            return {}
         color_price_pairs = {}
-        for variations in form_data:
-            for variation in variations:
-                color = urllib.parse.unquote(variation['attributes']['attribute_pa_color'])
-                price = variation['display_price']
-                color_price_pairs[color] = price
+        try:
+            for variations in form_data:
+                for variation in variations:
+                    try:
+                        color = urllib.parse.unquote(variation['attributes']['attribute_pa_color'])
+                        price = variation['display_price']
+                        color_price_pairs[color] = price
+                    except KeyError as e:
+                        logging.error(f"Missing key in variation data: {e}")
+                        continue
+        except Exception as e:
+            logging.error(f"Error processing color-price pairs: {e}")
         return color_price_pairs
 
 
@@ -41,22 +57,11 @@ class ScrapIlandino(Scraper):
                     'Connection': 'keep-alive'
                 }
         
-        url_list = []
-        results = []
-        if product is not None:
-            try:
-                product = Product.objects.get(product_name=product)
-                url_list.append(product.url) 
-            except Product.DoesNotExist:
-                raise ProductNotFound
-        else:
-            products = Product.objects.filter(source_site=Product.SITE_ILANDINO).values('url')
-            url_list = [product['url'] for product in products]
-        
+        url_list = self.get_scrap_urls(site_constant=Product.SITE_ILANDINO, product=product)
         
         for url in url_list:
             try:
-                
+                logging.info(f"Scraping URL: {url}")
                 response = requests.get(url, headers=headers, timeout=10)
                 response.raise_for_status()
                 tree = html.fromstring(response.content)
@@ -65,17 +70,23 @@ class ScrapIlandino(Scraper):
                 price = int(price_nodes[0].strip().replace('$', '').replace(',', '')) if price_nodes else None
 
                 form_nodes = tree.xpath(self.FORM_XPATH)
-                color_price_data = self.extract_color_price(form_nodes)
+                if form_nodes:
+                    color_price_data = self.extract_color_price(form_nodes)
+                else:
+                    logging.error(f"Error extracting price for {url}: {e}")
 
                 description = ''
                 description_nodes = tree.xpath(self.DESCRIPTION_XPATHS)
-                description = ' '.join(text.strip() for text in description_nodes if text.strip())
-                
+                if description_nodes:
+                    description = ' '.join(text.strip() for text in description_nodes if text.strip())
+                else:
+                    logging.error(f"Error extracting description for {url}: {e}")
+
                 try:
                     product = Product.objects.get(url=url)
                     product_name_for_save = product.product_name
                 except Product.DoesNotExist:
-                    results.append(f"Skipped {url}: No product record found")
+                    logging.warning(f"No product record found for {url}")
                     continue
                 
                 # Save the scraped data in database
@@ -86,16 +97,16 @@ class ScrapIlandino(Scraper):
                         description=description,
                         price=price,
                     )
-                    results.append(message)
+                    logging.info(f"Product saved with message: {message}")
                 except ProductNotFound as e:
-                    results.append(f"Failed {product_name_for_save}: {e.message} (Code: {e.code})")
+                    logging.error(f"Failed to save {product_name_for_save}: {e.message} (Code: {e.code})")
         
             except requests.RequestException as e:
-                results.append(f"Failed {url}: Network error - {e}")
+                logging.error(f"Network error for {url}: {e}")
             except Exception as e:
-                results.append(f"Failed {url}: Unexpected error - {e}")
+                logging.error(f"Unexpected error for {url}: {e}")
         
-        return results if results else ["No URLs processed"]
+        logging.info(f"Scraping completed with ILANDINO")
 
 
 

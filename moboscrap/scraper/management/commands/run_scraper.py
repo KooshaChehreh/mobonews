@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from scraper.scrapers.ilandino import ScrapIlandino
 from scraper.scrapers.dizoland import ScrapDiznoland
 from scraper.scrapers.greenlion import ScrapGreenlion
+from scraper.scrapers.iranpowerology import ScrapIranpower
 
 
 from scraper.exceptions import ProductNotFound
@@ -30,12 +31,6 @@ class Command(BaseCommand):
         greenlion_scraper = ScrapGreenlion()
         greenlion_results = greenlion_scraper.scrap(product=product_name)
 
-        #     for result in results:
-        #         if "Updated" in result:
-        #             self.stdout.write(self.style.SUCCESS(result))
-        #         else:
-        #             self.stdout.write(self.style.ERROR(result))
-        # except ProductNotFound as e:
-        #     self.stdout.write(self.style.ERROR(f"Failed: {e.message} (Code: {e.code})"))
-        # except Exception as e:
-        #     self.stdout.write(self.style.ERROR(f"Unexpected error: {e}"))
+        iranpower_scraper = ScrapIranpower()
+        iranpower_results = iranpower_scraper.scrap(product=product_name)
+
