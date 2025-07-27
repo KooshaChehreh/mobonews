@@ -39,6 +39,13 @@ python manage.py test
 
 **mention that tests are sample and they should be completed.
 
+Django admin
+is available on http://localhost:8000/admin
+create a super user and loging and add products. product_name, url, product_type and source_site are constraints.
+1. docker exec -it mobonews bash
+2. cd moboscrap/
+3. python manage.py createsuperuser
+
 Running the Scraping Command
 The run_scraper command triggers scraping for all four sites.
 In the Terminal open the app container:
