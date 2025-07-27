@@ -72,15 +72,13 @@ class ScrapIlandino(Scraper):
                 form_nodes = tree.xpath(self.FORM_XPATH)
                 if form_nodes:
                     color_price_data = self.extract_color_price(form_nodes)
-                else:
-                    logging.error(f"Error extracting price for {url}: {e}")
 
                 description = ''
                 description_nodes = tree.xpath(self.DESCRIPTION_XPATHS)
                 if description_nodes:
                     description = ' '.join(text.strip() for text in description_nodes if text.strip())
                 else:
-                    logging.error(f"Error extracting description for {url}: {e}")
+                    logging.error(f"Error extracting description for {url}")
 
                 try:
                     product = Product.objects.get(url=url)
