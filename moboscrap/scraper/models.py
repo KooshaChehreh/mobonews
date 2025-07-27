@@ -38,6 +38,7 @@ class Product(models.Model):
 
     class Meta:
         unique_together = ('source_site', 'url')
+        db_table = 'scraper_product'
     
     @staticmethod
     def save_product_data(product_name, price=None, color_price_data=None, description=None, warranty=None, stock=None):
