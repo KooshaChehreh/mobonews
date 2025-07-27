@@ -9,7 +9,7 @@ from scraper.scrapers.base_scraper import Scraper
 # logging.basicConfig(filename='logs/scraper.log', level=logging.INFO)
 
 
-class ScrapGreenlion():
+class ScrapGreenlion(Scraper):
     PRICE_XPATH = "//div[contains(@class, 'product')]//p[contains(@class, 'price')]//span[contains(@class, 'amount')]/bdi/text()"
     DESCRIPTION_XPATHS = "//div[contains(@class, 'product')]//section[4]//div[contains(@class, 'description') or contains(@class, 'content')]//text()"
     WARRANTY_XPATH = "//div[contains(@class, 'product') or contains(@class, 'offer')]//ul/li/span[2]/text()"
