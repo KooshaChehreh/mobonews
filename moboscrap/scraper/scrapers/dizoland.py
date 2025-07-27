@@ -12,6 +12,7 @@ from scraper.scrapers.base_scraper import Scraper
 class ScrapDiznoland():
     PRICE_XPATH = "//div[contains(@class, 'product')]/section[2]/div//p[contains(@class, 'price')]/span/bdi/text() | //span[contains(@class, 'woocommerce-Price-amount')]/bdi/text()"
     DESCRIPTION_XPATHS = "//*[@id='tab-description']/p[1]/text()"
+    WARRANTY_XPATH = "//form[contains(@class, 'variations_form')]//select[contains(@name, 'guarantee') or contains(@id, 'pa_guarantee')]/option/text()"
 
 
     def scrap(self, product=None):
@@ -40,7 +41,7 @@ class ScrapDiznoland():
         for url in url_list:
             try:
                 
-                response = requests.get(url, headers=headers, timeout=10)
+                response = requests.get("https://dizoland.com/product/roborock-saros-10r/", headers=headers, timeout=10)
                 response.raise_for_status()
                 tree = html.fromstring(response.content)
                 
@@ -51,6 +52,10 @@ class ScrapDiznoland():
                 description_nodes = tree.xpath(self.DESCRIPTION_XPATHS)
                 description = ' '.join(text.strip() for text in description_nodes if text.strip())
 
+                warranty = None
+                warranty_nodes = tree.xpath(self.WARRANTY_XPATH)
+                warranty_options = [node.strip() for node in warranty_nodes if node.strip() and node.strip() != "یک گزینه را انتخاب کنید"]
+                warranty = ', '.join(set(warranty_options)) if warranty_options else None
                 
                 try:
                     product = Product.objects.get(url=url)
@@ -65,6 +70,7 @@ class ScrapDiznoland():
                         product_name=product_name_for_save,
                         description=description,
                         price=price,
+                        warranty=warranty
                     )
                     results.append(message)
                 except ProductNotFound as e:
@@ -76,14 +82,6 @@ class ScrapDiznoland():
                 results.append(f"Failed {url}: Unexpected error - {e}")
         
         return results if results else ["No URLs processed"]
-
-
-
-
-
-
-
-
 
 
 
