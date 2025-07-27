@@ -9,9 +9,9 @@ from scraper.scrapers.base_scraper import Scraper
 # logging.basicConfig(filename='logs/scraper.log', level=logging.INFO)
 
 
-class ScrapDiznoland(Scraper):
-    PRICE_XPATH = "//div[contains(@class, 'product')]/section[2]/div/div[3]/div/div[3]/div/p/span/bdi/text()"
-    DESCRIPTION_XPATHS = '//*[@id="tab-description"]/p[1]'
+class ScrapDiznoland():
+    PRICE_XPATH = "//div[contains(@class, 'product')]/section[2]/div//p[contains(@class, 'price')]/span/bdi/text() | //span[contains(@class, 'woocommerce-Price-amount')]/bdi/text()"
+    DESCRIPTION_XPATHS = "//*[@id='tab-description']/p[1]/text()"
 
 
     def scrap(self, product=None):
@@ -33,7 +33,7 @@ class ScrapDiznoland(Scraper):
             except Product.DoesNotExist:
                 raise ProductNotFound
         else:
-            products = Product.objects.filter(source_site=Product.SITE_ILANDINO).values('url')
+            products = Product.objects.filter(source_site=Product.SITE_DIZOLAND).values('url')
             url_list = [product['url'] for product in products]
         
         
@@ -45,11 +45,12 @@ class ScrapDiznoland(Scraper):
                 tree = html.fromstring(response.content)
                 
                 price_nodes = tree.xpath(self.PRICE_XPATH)
-                price = int(price_nodes[0].strip().replace('$', '').replace(',', '')) if price_nodes else None
+                price = int(price_nodes[3].strip().replace(',', '')) if price_nodes else None
 
                 description = ''
                 description_nodes = tree.xpath(self.DESCRIPTION_XPATHS)
                 description = ' '.join(text.strip() for text in description_nodes if text.strip())
+
                 
                 try:
                     product = Product.objects.get(url=url)

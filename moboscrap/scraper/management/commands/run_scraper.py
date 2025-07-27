@@ -1,5 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from scraper.scrapers.ilandino import ScrapIlandino
+from scraper.scrapers.dizoland import ScrapDiznoland
+
 from scraper.exceptions import ProductNotFound
 
 
@@ -17,8 +19,12 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         product_name = kwargs['name']
         # try:
-        scraper = ScrapIlandino()
-        results = scraper.scrap(product=product_name)
+        ilandini_scraper = ScrapIlandino()
+        results = ilandini_scraper.scrap(product=product_name)
+
+        dizoland_scraper = ScrapDiznoland()
+        results = dizoland_scraper.scrap(product=product_name)
+
         #     for result in results:
         #         if "Updated" in result:
         #             self.stdout.write(self.style.SUCCESS(result))
