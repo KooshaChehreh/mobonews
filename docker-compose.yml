@@ -12,6 +12,22 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:6-alpine
+    container_name: moboscrap_redis
+    # ports:
+    #   - "6379:6379"
+
+  celery_worker:
+    build: .
+    container_name: moboscrap_celery_worker
+    command: celery -A moboscrap worker --loglevel=debug
+    depends_on:
+      - redis
+      - app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
   app:
     build:

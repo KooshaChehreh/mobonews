@@ -70,6 +70,7 @@ class ScrapIlandino(Scraper):
                 price = int(price_nodes[0].strip().replace('$', '').replace(',', '')) if price_nodes else None
 
                 form_nodes = tree.xpath(self.FORM_XPATH)
+                color_price_data = {}
                 if form_nodes:
                     color_price_data = self.extract_color_price(form_nodes)
 

@@ -3,13 +3,10 @@ djangorestframework
 psycopg2-binary
 dj_database_url
 django-filter
-PyJWT~=2.8.0
 drf-spectacular
 django-cors-headers
 gunicorn
 django-storages[s3]
-model_bakery
-freezegun
 django-extensions
 uvicorn
 jdatetime
@@ -19,9 +16,6 @@ django-admin-interface
 django-colorfield
 cryptography
 beautifulsoup4
-coverage
-django-otp
-segno
 celery
 redis
 django-celery-beat

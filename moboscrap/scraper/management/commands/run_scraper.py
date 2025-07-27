@@ -3,13 +3,18 @@ from scraper.scrapers.ilandino import ScrapIlandino
 from scraper.scrapers.dizoland import ScrapDiznoland
 from scraper.scrapers.greenlion import ScrapGreenlion
 from scraper.scrapers.iranpowerology import ScrapIranpower
+import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 from scraper.exceptions import ProductNotFound
 
 
+from django.core.management.base import BaseCommand
+from scraper.tasks import scrap_ilandino, scrap_dizoland, scrap_greenlion, scrap_iranpower
+
 class Command(BaseCommand):
-    help = 'Scrape product data from ilandino.com'
+    help = 'Scrape product data from ilandino.com, dizoland, greenlion, and iranpower'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -21,16 +26,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         product_name = kwargs['name']
-        # try:
-        ilandino_scraper = ScrapIlandino()
-        ilandino_results = ilandino_scraper.scrap(product=product_name)
+        self.stdout.write(self.style.SUCCESS('Starting scraping tasks...'))
 
-        dizoland_scraper = ScrapDiznoland()
-        dizoland_results = dizoland_scraper.scrap(product=product_name)
+        # Run Celery tasks asynchronously
+        ilandino_task = scrap_ilandino.delay(product_name)
+        dizoland_task = scrap_dizoland.delay(product_name)
+        greenlion_task = scrap_greenlion.delay(product_name)
+        iranpower_task = scrap_iranpower.delay(product_name)
 
-        greenlion_scraper = ScrapGreenlion()
-        greenlion_results = greenlion_scraper.scrap(product=product_name)
+        results = [
+            ilandino_task.get(),
+            dizoland_task.get(),
+            greenlion_task.get(),
+            iranpower_task.get()
+        ]
 
-        iranpower_scraper = ScrapIranpower()
-        iranpower_results = iranpower_scraper.scrap(product=product_name)
-
+        for result in results:
+            logging.info(result)
