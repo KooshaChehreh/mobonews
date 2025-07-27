@@ -69,6 +69,7 @@ class ScrapGreenlion(Scraper):
                         product_name=product_name_for_save,
                         description=description,
                         price=price,
+                        warranty=warranty
                     )
                     results.append(message)
                 except ProductNotFound as e:
