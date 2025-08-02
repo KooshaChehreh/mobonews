@@ -62,8 +62,5 @@ Update All Products:python manage.py run_scraper
 Update a Specific Product:python manage.py run_scraper -n "Roborock Saros 10R"
 
 
-
-
-
 How It Works
 The run_scraper command triggers Celery tasks to scrape and update product data (price, color prices, description) for each site where the product exists in the Product model.
